@@ -37,3 +37,7 @@ https://www.tutorialspoint.com/python/python_multithreading.htm
 https://stackoverflow.com/questions/52154496/kivy-simple-multithreading-python
 
 https://www.reddit.com/r/learnpython/comments/bcymes/how_to_implement_multithreading_in_kivy/
+
+
+returning array from c
+https://stackoverflow.com/questions/14887378/how-to-return-array-from-c-function-to-python-using-ctypes

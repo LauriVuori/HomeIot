@@ -10,7 +10,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.slider import Slider
 
 #Call c
-from ctypes import *
+import ctypes
+
 #threads
 import threading
 
@@ -38,16 +39,16 @@ Config.set('graphics', 'height', '900')
 
 
 def thread():
-    Cfunc.main()
+    num = ctypes.POINTER(ctypes.c_int * 10)
+    print(type(num))
+    num = ctypes.CDLL("./Cfunc.so").main(num)
+    num.restype = ctypes.POINTER(ctypes.c_int * 10)
+    print(num)
     # try:
     #     x = threading.Thread(target=, args=())
     #     x.start()
     # except BaseException:
     #     print('Error: unable to start thread')
-
-
-so_file = "./Cfunc.so"
-Cfunc = CDLL(so_file)
 
 def printti():
     while 1:
@@ -97,7 +98,8 @@ class ServerApp(App):
 
 
 if __name__ == "__main__":
-    d = threading.Thread(target=ServerApp().run(), args=())
+    # d = threading.Thread(target=ServerApp().run(), args=())
     # d.daemon = True
-    d.start()
+    # d.start()
     # ServerApp().run()
+    # thread()
