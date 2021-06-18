@@ -23,7 +23,7 @@
 //    unsigned char        sin_zero[8];
 // };
 
-
+int checkAvailableConnections(struct info * connectionInfo);
 void printCurrentConnections(struct Client * clients);
 void* acceptClientThread(void* data);
 
@@ -35,6 +35,7 @@ int main(void) {
     /*SOCKET*/
     int sockfd; 
     struct sockaddr_in servaddr;
+    struct info information = {0};
     char menu[5];
     /*SOCKET END*/
     struct Client clients[MAXCONNECTIONS];
@@ -59,18 +60,19 @@ int main(void) {
     // int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
     int currentConnections = 0;
     while(1) {
-        if (currentConnections < MAXCONNECTIONS) {
+        // if (currentConnections < MAXCONNECTIONS) {
             if (clients[currentConnections].threadCreated == false) {
                 clients[currentConnections].threadCreated = true;
                 pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[currentConnections]);
             }
-            if (clients[currentConnections].acceptedClient > 0){
+            if (clients[currentConnections].acceptedClient > 0){   
                 pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[currentConnections]);
-                currentConnections++;
+                information.connectionTable[currentConnections]++;
+                currentConnections = checkAvailableConnections(&information);
                 // printCurrentConnections(&clients);
             }
-        }
-        printCurrentConnections(&clients);
+        // }
+        // printCurrentConnections(&clients);
         // int test = printCurrentConnections(&clients);
         // if (test != 0) {
         //     printf("connections %d\n", test);
@@ -87,6 +89,14 @@ int main(void) {
     pthread_exit(NULL);
 }
 
+int checkAvailableConnections(struct info * connectionInfo) {
+    int i = 0;
+    while (connectionInfo->connectionTable[i] != 0) {
+        i++;
+    }
+    return i;
+}
+
 void printCurrentConnections(struct Client * clients) {
     int connectionCount = 0;
     for (int i = 0; i < MAXCONNECTIONS; i++) {
@@ -98,8 +108,8 @@ void printCurrentConnections(struct Client * clients) {
     printf(RED"Current connections: %d\n"RESET, connectionCount);
 }
 
-void* receiveDataThread(void* data) {
-    struct Client * Client = (struct Client*)data;
+void* receiveDataThread(void* client) {
+    struct Client * Client = (struct Client*)client;
     receiveData(Client);
     pthread_exit(NULL);
 }

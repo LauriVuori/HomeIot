@@ -59,13 +59,9 @@ struct Client{
     enum boolean threadCreated;
 };
 
-// struct info{
-//     struct sockaddr_in client;
-//     struct tcpErrors error;
-//     struct tcpOptions options;
-//     int acceptedClient;
-//     int sockfd;
-// };
+struct info{
+    int connectionTable[MAXCONNECTIONS];
+};
 /*-------------------------------------------------------------------*
 *    FUNCTION PROTOTYPES                                             *
 *--------------------------------------------------------------------*/
@@ -76,4 +72,4 @@ void initSocket(struct sockaddr_in * servAddr, int * sockfd);
 void acceptClient(struct sockaddr_in * servAddr, int * sockfd, int * accClient);
 void exit_signal(int sig);
 void initClient(struct Client * currentClient, int sockfd);
-void* receiveDataThread(void* data);
+void* receiveDataThread(void* client);
