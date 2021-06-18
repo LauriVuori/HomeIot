@@ -24,7 +24,7 @@
 // };
 
 
-
+void printCurrentConnections(struct Client * clients);
 void* acceptClientThread(void* data);
 
 int main(void) {
@@ -37,43 +37,67 @@ int main(void) {
     struct sockaddr_in servaddr;
     char menu[5];
     /*SOCKET END*/
-    struct Client Client[MAXCONNECTIONS];
+    struct Client clients[MAXCONNECTIONS];
 
     pthread_t  thread_id; 
 
-    
     signal(SIGINT, exit_signal); 
 
     initSocket(&servaddr, &sockfd);
-    
-    // Client client[5];
-
-    initClient(&Client[0], sockfd);
-    int a = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&Client[0]);
-    while (Client[0].acceptedClient < 0);
-
-    // int b = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&client[1]);
-
-    // int c = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&client[2]);
-    int asd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&Client[0]);
+    initClient(&clients[0], sockfd);
 
 
-    initClient(&Client[1], sockfd);
-    int dda = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&Client[1]);
-    while (Client[1].acceptedClient < 0);
-    int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&Client[1]);
+    // int a = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[0]);
+    // while (clients[0].acceptedClient < 0);
+
+    // // int asd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[0]);
+
+
+    // // initClient(&clients[1], sockfd);
+    // int dda = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[1]);
+    // while (clients[1].acceptedClient < 0);
+    // int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
+    int currentConnections = 0;
     while(1) {
-        // if (error.zeroBuffer == 1) {
-        //     close(sockfd);
-        //     pthread_exit(NULL);
-        //     exit(1);
+        if (currentConnections < MAXCONNECTIONS) {
+            if (clients[currentConnections].threadCreated == false) {
+                clients[currentConnections].threadCreated = true;
+                pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[currentConnections]);
+            }
+            if (clients[currentConnections].acceptedClient > 0){
+                pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[currentConnections]);
+                currentConnections++;
+                // printCurrentConnections(&clients);
+            }
+        }
+        printCurrentConnections(&clients);
+        // int test = printCurrentConnections(&clients);
+        // if (test != 0) {
+        //     printf("connections %d\n", test);
         // }
+    //     // if (error.zeroBuffer == 1) {
+    //     //     close(sockfd);
+    //     //     pthread_exit(NULL);
+    //     //     exit(1);
+    //     // }
     }
 
 
     close(sockfd);
     pthread_exit(NULL);
 }
+
+void printCurrentConnections(struct Client * clients) {
+    int connectionCount = 0;
+    for (int i = 0; i < MAXCONNECTIONS; i++) {
+        if (clients->acceptedClient > 0) {
+            connectionCount++;
+        }
+        clients++;
+    }
+    printf(RED"Current connections: %d\n"RESET, connectionCount);
+}
+
 void* receiveDataThread(void* data) {
     struct Client * Client = (struct Client*)data;
     receiveData(Client);
@@ -91,10 +115,14 @@ void* receiveDataThread(void* data) {
 */
 /*********************************************************************/
 void initClient(struct Client * currentClient, int sockfd) {
-    currentClient->sockfd = sockfd;
-    currentClient->acceptedClient = -1;
-    currentClient->error.zeroBuffer = false;
-    currentClient->options.sendDataBack = true;
+    for (int i = 0; i < MAXCONNECTIONS; i++) {
+        currentClient->sockfd = sockfd;
+        currentClient->acceptedClient = -1;
+        currentClient->error.zeroBuffer = false;
+        currentClient->options.sendDataBack = true;
+        currentClient->threadCreated = false;
+        currentClient++;
+    }
 }
 /*********************************************************************
 	F U N C T I O N    D E S C R I P T I O N
@@ -128,7 +156,7 @@ void* acceptClientThread(void* data) {
     // printf(RED"LEN:<%d>\n"RESET,len);
     // int accept (int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen);
     newClient->acceptedClient = accept(newClient->sockfd, (struct sockaddr*)&newClient->client, &len);
-    printf(RED"acceptedClient:<%d>\n"RESET, newClient->acceptedClient);
+    // printf(RED"acceptedClient:<%d>\n"RESET, newClient->acceptedClient);
 
     if (newClient->acceptedClient < 0) {
         printf(RED"Accepting server failed\n"RESET);

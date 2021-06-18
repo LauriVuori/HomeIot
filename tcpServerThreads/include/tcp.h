@@ -56,7 +56,16 @@ struct Client{
     struct tcpOptions options;
     int acceptedClient;
     int sockfd;
+    enum boolean threadCreated;
 };
+
+// struct info{
+//     struct sockaddr_in client;
+//     struct tcpErrors error;
+//     struct tcpOptions options;
+//     int acceptedClient;
+//     int sockfd;
+// };
 /*-------------------------------------------------------------------*
 *    FUNCTION PROTOTYPES                                             *
 *--------------------------------------------------------------------*/
