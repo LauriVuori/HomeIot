@@ -5,6 +5,15 @@
 void exit_signal(int sig);
 
 
+void print(int arr[]) {
+    printf("C PRINT\n");
+    for (int i = 0; i < 3; i++) {
+        printf("<%d>\n", arr[i]);
+        arr[i] += 10;
+    }
+    printf("C PRINT END\n");
+}
+
 int test(int **ar,int *lens,int n_ar){
     int ii,jj,kk;
     for (ii=0;ii<n_ar;ii++){
@@ -17,11 +26,8 @@ int test(int **ar,int *lens,int n_ar){
     return 0;
 }
 
-void main(int **ar) {
-    for(int i = 0; i < 5; i++) {
-        **ar = 'a';
-        *ar++;
-    }
+void main(int arr[]) {
+    printf("%d", arr[0]);
     signal(SIGINT, exit_signal); 
     printf("SLEEP\n");
     sleep(1);
