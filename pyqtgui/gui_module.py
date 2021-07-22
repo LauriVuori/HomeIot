@@ -21,9 +21,9 @@ class Ui_tcp_server(object):
         self.push_button_2 = QtWidgets.QPushButton(tcp_server)
         self.push_button_2.setGeometry(QtCore.QRect(0, 30, 89, 25))
         self.push_button_2.setObjectName("push_button_2")
-        self.lineEdit = QtWidgets.QLineEdit(tcp_server)
-        self.lineEdit.setGeometry(QtCore.QRect(440, 10, 113, 61))
-        self.lineEdit.setObjectName("lineEdit")
+        self.textBrowser = QtWidgets.QTextBrowser(tcp_server)
+        self.textBrowser.setGeometry(QtCore.QRect(10, 250, 256, 192))
+        self.textBrowser.setObjectName("textBrowser")
 
         self.retranslateUi(tcp_server)
         QtCore.QMetaObject.connectSlotsByName(tcp_server)

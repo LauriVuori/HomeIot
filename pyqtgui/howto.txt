@@ -1,0 +1,10 @@
+https://linuxhint.com/use-pyqt-gui-builder/
+https://realpython.com/qt-designer-python/
+
+
+
+pyuic5 tcp_server.ui -o gui_module.py
+
+
+text box
+https://stackoverflow.com/questions/57563047/how-can-i-display-terminal-output-to-a-text-box-in-pyqt
