@@ -6,7 +6,7 @@ void exit_signal(int sig);
 
 
 void print(int arr[],int flag[]) {
-    while(flag[0] == 0) {
+    while(flag[0] == 1) {
         printf("C PRINT\n");
         for (int i = 0; i < 3; i++) {
             printf("<%d>\n", arr[i]);

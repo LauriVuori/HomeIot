@@ -13,30 +13,30 @@
   <property name="windowTitle">
    <string>tcp_server_lv</string>
   </property>
-  <widget class="QPushButton" name="push_button_1">
+  <widget class="QPushButton" name="button_print_to_box">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
+     <x>10</x>
+     <y>190</y>
      <width>89</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
-    <string>Button1</string>
+    <string>Print to box</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="push_button_2">
+  <widget class="QPushButton" name="button_stop_server">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>30</y>
+     <x>520</x>
+     <y>40</y>
      <width>89</width>
      <height>25</height>
     </rect>
    </property>
    <property name="text">
-    <string>Button2</string>
+    <string>Stop server</string>
    </property>
   </widget>
   <widget class="QTextBrowser" name="textBrowser">
@@ -49,10 +49,36 @@
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="button_start_server">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>10</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Start server</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="button_clear_box">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>220</y>
+     <width>89</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Clear box</string>
+   </property>
+  </widget>
  </widget>
  <tabstops>
-  <tabstop>push_button_1</tabstop>
-  <tabstop>push_button_2</tabstop>
+  <tabstop>button_print_to_box</tabstop>
+  <tabstop>button_stop_server</tabstop>
  </tabstops>
  <resources/>
  <connections/>

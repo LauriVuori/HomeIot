@@ -7,6 +7,8 @@ import ctypes
 #threads
 import threading
 
+import const
+
 from time import sleep
 
 # self.textBrowser.append("tever"), https://www.w3schools.com/python/python_ref_list.asp
@@ -16,13 +18,14 @@ def thread():
     c_types_array[0] = 0
     c_types_array[1] = 1
     c_types_array[2] = 2
-    c_flags[0] = 0
-    c_flags[1] = 0
-    c_flags[2] = 0
+    c_flags[const.TCP_SERVER_RUNNING] = True
+    c_flags[1] = True
+    c_flags[2] = True
     c_funtions = ctypes.CDLL("./Cfunc.so")
     c_funtions.print(c_types_array, c_flags)
-    for i in range(len(c_types_array)):
-        print(c_types_array[i])
+    # print("C IN PYTHON")
+    # for i in range(len(c_types_array)):
+    #     print(c_types_array[i])
     
     
     
@@ -40,13 +43,11 @@ class MyApp (QtWidgets.QMainWindow, gui_module.Ui_tcp_server):
     def __init__(self, parent=None):
 
         super(MyApp, self).__init__(parent)
-
         # Load the login form
 
         self.setupUi(self)
         self.setup_button_actions()
 
-        self.start_threading()
 
     def start_threading(self):
         print("Threading started")
@@ -58,8 +59,10 @@ class MyApp (QtWidgets.QMainWindow, gui_module.Ui_tcp_server):
 
     def setup_button_actions(self):
         # self.push_button_1.connect(self.button1_press)
-        self.push_button_1.clicked.connect(self.button1_press)
-        self.push_button_2.clicked.connect(self.button2_press)
+        self.button_print_to_box.clicked.connect(self.print_to_box)
+        self.button_stop_server.clicked.connect(self.stop_server)
+        self.button_start_server.clicked.connect(self.start_server)
+        self.button_clear_box.clicked.connect(self.clear_textbox)
 
     def write_to_textbox(self, string):
         self.textBrowser.append(string)
@@ -70,37 +73,22 @@ class MyApp (QtWidgets.QMainWindow, gui_module.Ui_tcp_server):
     def ui_components(self):
         pass
 
-    def button1_press(self):
-        print("func1 print")
-        text = str(self.c_types_array[0] + " " + self.c_types_array[1])
+    def print_to_box(self):
+        text = "numbers from c func:" + str(c_types_array[0]) + " " + str(c_types_array[1]) + " " + str(c_types_array[2])
         self.write_to_textbox(text)
-        
 
-    def button2_press(self):
-        print("FUNC2, clear")
-        self.clear_textbox()
-        c_flags[0] = 1
-        print("closing gui")
+    def start_server(self):
+        self.button_start_server.setStyleSheet("background-color : green")
+        self.button_stop_server.setStyleSheet("background-color : light gray")
+        self.c_thread = threading.Thread(target=thread, args=())
+        self.start_threading()
+
+
+    def stop_server(self):
+        self.button_stop_server.setStyleSheet("background-color : red")
+        self.button_start_server.setStyleSheet("background-color : light gray")
+        c_flags[const.TCP_SERVER_RUNNING] = False
         self.c_thread.join()
-        
-        
-        
-        # self.text.setText("fun2")
-
-    #     if self.textEdit.toPlainText() == 'admin' and self.textEdit_2.toPlainText() == 'superuser':
-
-    #         print('Authenticated User')
-
-    #     else:
-
-    #         print('Unauthenticated User')
-
-
-    # Declare method to terminate the script when Cancel button will click
-
-    # def cancelClicked(self):
-
-    #     exit()
 
 
 
@@ -114,7 +102,6 @@ if __name__ == "__main__":
 
     # Display the form
     form.show()
-
     # Start the event loop of the app or dialog box
     app.exec()
     
