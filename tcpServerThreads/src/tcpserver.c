@@ -11,7 +11,7 @@
 #include <signal.h>
 #include <pthread.h>
 #include <../include/tcp.h>
-
+#define DEBUG_LEVEL 0
 // struct sockaddr {
 //    unsigned short   sa_family;
 //    char             sa_data[14];
@@ -39,36 +39,32 @@ int main(void) {
     char menu[5];
     /*SOCKET END*/
     struct Client clients[MAXCONNECTIONS];
-
     pthread_t  thread_id; 
-
     signal(SIGINT, exit_signal); 
-
+    // Initialize socket
     initSocket(&servaddr, &sockfd);
+    // Init available connections, MAXCONNECTIONS
     initClient(&clients[0], sockfd);
 
-
-    // int a = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[0]);
-    // while (clients[0].acceptedClient < 0);
-
-    // // int asd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[0]);
-
-
-    // // initClient(&clients[1], sockfd);
-    // int dda = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[1]);
-    // while (clients[1].acceptedClient < 0);
-    // int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
     int currentConnections = 0;
     while(1) {
         // if (currentConnections < MAXCONNECTIONS) {
+            // check if current client is created, 1/0 value
             if (clients[currentConnections].threadCreated == false) {
+                // start creating connection
                 clients[currentConnections].threadCreated = true;
+                // create thread for client listening, waiting untill client is ready
                 pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[currentConnections]);
             }
-            if (clients[currentConnections].acceptedClient > 0){   
+            // if [currentConnections] acceptedClient have something in it otherwise it is 0
+            if (clients[currentConnections].acceptedClient > 0){
+                // if client is accepted it will be moved in own thread to listen client
                 pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[currentConnections]);
+                // set flag for information table that there is connection for designated spot
                 information.connectionTable[currentConnections]++;
+                // ??? if some connection is lost, use that slot ????
                 currentConnections = checkAvailableConnections(&information);
+
                 // printCurrentConnections(&clients);
             }
         // }
@@ -88,6 +84,19 @@ int main(void) {
     close(sockfd);
     pthread_exit(NULL);
 }
+
+
+// int a = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[0]);
+// while (clients[0].acceptedClient < 0);
+
+// // int asd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[0]);
+
+
+// // initClient(&clients[1], sockfd);
+// int dda = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[1]);
+// while (clients[1].acceptedClient < 0);
+// int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
+
 
 int checkAvailableConnections(struct info * connectionInfo) {
     int i = 0;
@@ -150,7 +159,7 @@ void* acceptClientThread(void* data) {
     int len = 0;
 
     clientCounter++;
-    printf(RED"CLIENT COUNTER: %d\n"RESET,clientCounter);
+    printf(RED"acceptClientThread threads created: %d\n"RESET,clientCounter);
 
     /* int listen(int sockfd,int backlog);
     backlog − It is the number of allowed connections.
@@ -304,7 +313,7 @@ void receiveData(struct Client * currentClient) {
             printf(YEL"Got empty buffer, maybe lost connection\n"RESET);
         }
         else{
-            printf("From client: %s\n", buff);
+            printf("From client : %s\n", buff);
             if (currentClient->options.sendDataBack == true) {
                 sendData(&currentClient->acceptedClient, &buff);
             }
