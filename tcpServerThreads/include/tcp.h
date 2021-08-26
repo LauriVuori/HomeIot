@@ -45,7 +45,7 @@ struct tcpOptions{
 
 /*!
  * @struct Client
- * @brief 
+ * @brief
  * @param sockaddr_in client
  * @param int acceptedClient
  * @param int sockfd
