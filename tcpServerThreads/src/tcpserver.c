@@ -104,6 +104,9 @@ int main(void) {
 // while (clients[1].acceptedClient < 0);
 // int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
 
+
+// check available connections [1, 0, 0, 0, 0] -> [1, 1, 1, 0, 0] -> [0, 1, 1, 0, 0] -> [1, 1, 1, 0, 0]
+// so always fill cons
 int checkAvailableConnections(struct info * connectionInfo, struct Client * clients) {
     int currentConnection;
     int ii;
