@@ -11,7 +11,8 @@
 #include <signal.h>
 #include <pthread.h>
 #include <../include/tcp.h>
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
+#define NO_CONNECTION -1
 // struct sockaddr {
 //    unsigned short   sa_family;
 //    char             sa_data[14];
@@ -23,7 +24,13 @@
 //    unsigned char        sin_zero[8];
 // };
 
-int checkAvailableConnections(struct info * connectionInfo);
+// typedef struct error {
+//     int error_binding_socket = 0;
+// } errors;
+
+
+int checkAvailableConnections(struct info * connectionInfo, struct Client * clients);
+// int checkAvailableConnections(struct info * connectionInfo);
 void printCurrentConnections(struct Client * clients);
 void* acceptClientThread(void* data);
 
@@ -36,6 +43,8 @@ int main(void) {
     int sockfd; 
     struct sockaddr_in servaddr;
     struct info information = {0};
+
+
     char menu[5];
     /*SOCKET END*/
     struct Client clients[MAXCONNECTIONS];
@@ -63,9 +72,7 @@ int main(void) {
                 // set flag for information table that there is connection for designated spot
                 information.connectionTable[currentConnections]++;
                 // ??? if some connection is lost, use that slot ????
-                currentConnections = checkAvailableConnections(&information);
-
-                // printCurrentConnections(&clients);
+                currentConnections = checkAvailableConnections(&information, &clients[0]);
             }
         // }
         // printCurrentConnections(&clients);
@@ -97,8 +104,51 @@ int main(void) {
 // while (clients[1].acceptedClient < 0);
 // int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
 
+int checkAvailableConnections(struct info * connectionInfo, struct Client * clients) {
+    int currentConnection;
+    int ii;
+    currentConnection = 0;
+    ii = 0;
+    
+    while (ii < MAXCONNECTIONS) {
+        printf("<<<<<<<<<<<<%d>>>>>>>>>>>", ii);
+        if (((clients->acceptedClient)+ii) == NO_CONNECTION) {
+            currentConnection = ii;
+            ii = MAXCONNECTIONS;
+        }
+        ii++;
+    }
 
-int checkAvailableConnections(struct info * connectionInfo) {
+    if (DEBUG_LEVEL == 5) {
+        ii = 0;
+        printf("DEBUG:\n");
+        while (ii < MAXCONNECTIONS) {
+            if (((clients->acceptedClient)+ii) != NO_CONNECTION) {
+                printf(" 1 ");
+            }
+            else {
+                printf(" 0 ");
+            }
+            ii++;
+        }
+        printf("DEBUG END:\n");
+    }
+    
+    // int i = 0;
+    // printf("CLIENTS: ");
+    // for (int i = 0; i < MAXCONNECTIONS; i++) {
+    //     printf("%d ", (clients->acceptedClient));
+    //     clients++;
+    // }
+    // printf("\n-----------------\n");
+    // while (connectionInfo->connectionTable[i] != -1) {
+    //     i++;
+    // }
+    // for (int i = 0; i < MAXCONNECTIONS; i++) {
+    //     printf("%d ", connectionInfo->connectionTable[i]);
+    // }
+    // printf("\n");
+    printf("<<<%d>>>", currentConnection);
     int i = 0;
     while (connectionInfo->connectionTable[i] != 0) {
         i++;
@@ -108,13 +158,18 @@ int checkAvailableConnections(struct info * connectionInfo) {
 
 void printCurrentConnections(struct Client * clients) {
     int connectionCount = 0;
+    printf(RED"Current connections:[%d\n"RESET, connectionCount);
     for (int i = 0; i < MAXCONNECTIONS; i++) {
         if (clients->acceptedClient > 0) {
-            connectionCount++;
+            printf("1 ");
+        }
+        else {
+            printf("0 ");
         }
         clients++;
     }
-    printf(RED"Current connections: %d\n"RESET, connectionCount);
+    clients -= MAXCONNECTIONS;
+    printf("]\n");
 }
 
 void* receiveDataThread(void* client) {
@@ -159,7 +214,7 @@ void* acceptClientThread(void* data) {
     int len = 0;
 
     clientCounter++;
-    printf(RED"acceptClientThread threads created: %d\n"RESET,clientCounter);
+    printf(RED"acceptClient Thread threads created: %d\n"RESET,clientCounter);
 
     /* int listen(int sockfd,int backlog);
     backlog − It is the number of allowed connections.
@@ -280,7 +335,8 @@ void initSocket(struct sockaddr_in * servAddr, int * sockfd) {
     servAddr->sin_port = htons(PORT);
     // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
     if (bind(*sockfd, (const struct sockaddr*)servAddr, sizeof(*servAddr)) < 0) {
-        printf("error binding socket");
+        printf("error binding socket\n");
+        exit(0);
     }
     else{
         printf("Socket binded\n");
@@ -311,6 +367,7 @@ void receiveData(struct Client * currentClient) {
             // in case of connection lost etc..
             currentClient->error.zeroBuffer = true;
             printf(YEL"Got empty buffer, maybe lost connection\n"RESET);
+            currentClient->acceptedClient = -1;
         }
         else{
             printf("From client : %s\n", buff);
