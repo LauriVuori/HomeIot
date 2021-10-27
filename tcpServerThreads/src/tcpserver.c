@@ -114,7 +114,7 @@ int checkAvailableConnections(struct info * connectionInfo, struct Client * clie
     ii = 0;
     
     while (ii < MAXCONNECTIONS) {
-        printf("<<<<<<<<<<<<%d>>>>>>>>>>>", ii);
+        printf("<<<<<<<<<<<<%d>>>>>>>>>>>\n", ii);
         if (((clients->acceptedClient)+ii) == NO_CONNECTION) {
             currentConnection = ii;
             ii = MAXCONNECTIONS;
@@ -394,7 +394,7 @@ void func(int *sockfd) {
         // read the message from client and copy it in buffer 
         read(*sockfd, buff, sizeof(buff)); 
         // print buffer which contains the client contents 
-        printf("From client: %s\t To client : ", buff); 
+        printf("From client: %s\t To client : \n", buff); 
         bzero(buff, MAX); 
         n = 0; 
         // copy server message in the buffer 
@@ -413,6 +413,6 @@ void func(int *sockfd) {
 }
 
 void exit_signal(int sig) {
-    printf("CTRL-C exit");
+    printf("CTRL-C exit\n");
     exit(1);
 }
