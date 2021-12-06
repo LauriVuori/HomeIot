@@ -68,7 +68,7 @@ struct info{
 void func(int * sockfd);
 void receiveData(struct Client * currentClient);
 void sendData(int * sockfd, char (*data)[MAX]);
-void initSocket(struct sockaddr_in * servAddr, int * sockfd);
+int initSocket(struct sockaddr_in * servAddr, int * sockfd);
 void acceptClient(struct sockaddr_in * servAddr, int * sockfd, int * accClient);
 void exit_signal(int sig);
 void initClient(struct Client * currentClient, int sockfd);

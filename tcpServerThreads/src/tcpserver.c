@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <pthread.h>
+
 #include <../include/tcp.h>
 #define DEBUG_LEVEL 1
 #define NO_CONNECTION -1
@@ -30,7 +31,6 @@
 
 
 int checkAvailableConnections(struct info * connectionInfo, struct Client * clients);
-// int checkAvailableConnections(struct info * connectionInfo);
 void printCurrentConnections(struct Client * clients);
 void* acceptClientThread(void* data);
 
@@ -51,7 +51,9 @@ int main(void) {
     pthread_t  thread_id; 
     signal(SIGINT, exit_signal); 
     // Initialize socket
-    initSocket(&servaddr, &sockfd);
+    if (initSocket(&servaddr, &sockfd) < 0) {
+        printf("Error creating socket, socket not created\n");
+    }
     // Init available connections, MAXCONNECTIONS
     initClient(&clients[0], sockfd);
 
@@ -91,18 +93,6 @@ int main(void) {
     close(sockfd);
     pthread_exit(NULL);
 }
-
-
-// int a = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[0]);
-// while (clients[0].acceptedClient < 0);
-
-// // int asd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[0]);
-
-
-// // initClient(&clients[1], sockfd);
-// int dda = pthread_create(&thread_id, NULL, acceptClientThread, (void*)&clients[1]);
-// while (clients[1].acceptedClient < 0);
-// int ddd = pthread_create(&thread_id, NULL, receiveDataThread, (void*)&clients[1]);
 
 
 // check available connections [1, 0, 0, 0, 0] -> [1, 1, 1, 0, 0] -> [0, 1, 1, 0, 0] -> [1, 1, 1, 0, 0]
@@ -151,7 +141,7 @@ int checkAvailableConnections(struct info * connectionInfo, struct Client * clie
     //     printf("%d ", connectionInfo->connectionTable[i]);
     // }
     // printf("\n");
-    printf("<<<%d>>>", currentConnection);
+    printf("<<<%d>>> current cons", currentConnection);
     int i = 0;
     while (connectionInfo->connectionTable[i] != 0) {
         i++;
@@ -321,11 +311,12 @@ void acceptClient(struct sockaddr_in * client, int * sockfd, int * acceptClient)
  * @return 
 */
 /*********************************************************************/
-void initSocket(struct sockaddr_in * servAddr, int * sockfd) {
+int initSocket(struct sockaddr_in * servAddr, int * sockfd) {
     *sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sockfd < 0) {
         printf("ERROR opening socket\n");
+        return 0;
     }
     else{
         printf("Socket created\n");
@@ -339,10 +330,11 @@ void initSocket(struct sockaddr_in * servAddr, int * sockfd) {
     // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
     if (bind(*sockfd, (const struct sockaddr*)servAddr, sizeof(*servAddr)) < 0) {
         printf("error binding socket\n");
-        exit(0);
+        return 0;
     }
     else{
         printf("Socket binded\n");
+        return 1;
     }
 }
 
@@ -373,7 +365,8 @@ void receiveData(struct Client * currentClient) {
             currentClient->acceptedClient = -1;
         }
         else{
-            printf("From client : %s\n", buff);
+            // inet_ntoa(ca.sin_addr), ntohs(ca.sin_port));
+            printf("From client port %d = %s\n", ntohs(currentClient->client.sin_port), buff);
             if (currentClient->options.sendDataBack == true) {
                 sendData(&currentClient->acceptedClient, &buff);
             }

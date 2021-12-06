@@ -39,9 +39,11 @@ $(EXECUTABLE) : $(OBJECTS)
 .c.o: *.h
 	$(CC) $(CFLAGS) $< -o $@
 
-clean :
+clean:
 	-rm -f $(OBJECTS) $(EXECUTABLE)
 
+clean_release:
+	-rm -f $(OBJECTS) $(EXECUTABLE)
 
 #Here we define a new rule by combining two predefined rules
-full: all clean
+full: all clean_release
